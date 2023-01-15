@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const request = require("request");
+const https = require("https");
 
 const port = 3000;
 const app = express();
@@ -14,11 +15,11 @@ app.get("/", function (req, res) {
 
 app.post("/", function (req, res) {
 
-  let firstName = req.body.fName;
-  let lastName = req.body.lName;
-  let email = req.body.email;
+  const firstName = req.body.fName;
+  const lastName = req.body.lName;
+  const email = req.body.email;
 
-  let data = {
+  const data = {
     members: [
       {
         email_address: email,
@@ -30,6 +31,24 @@ app.post("/", function (req, res) {
       }
     ]
   };
+
+  const jsonData = JSON.stringify(data);
+
+  const url = "https://us21.api.mailchimp.com/3.0/lists/73bf87d946";
+
+  const options = {
+    method: "POST",
+    auth: "flavio1:e9d41efe7fbe31fad9398211ea809fe4-us21"
+  };
+
+  const request = https.request(url, options, function (response) {
+    response.on("data", function (data) {
+      console.log(JSON.parse(data));
+    });
+  });
+
+  request.write(jsonData);
+  request.end();
 
 });
 
